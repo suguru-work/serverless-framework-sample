@@ -1,0 +1,23 @@
+{
+  "name": "hogehoge",
+  "version": "1.0.0",
+  "description": "【Serverless Framework 入門】API の公開と DynamoDB との疎通",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suguruTakahashi-1234/sls-hogehoge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/suguruTakahashi-1234/sls-hogehoge/issues"
+  },
+  "homepage": "https://github.com/suguruTakahashi-1234/sls-hogehoge#readme",
+  "dependencies": {
+    "uuid": "^8.3.1"
+  }
+}
