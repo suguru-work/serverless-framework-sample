@@ -20,6 +20,23 @@ service: hogehoge
 # Check out our docs for more details
 frameworkVersion: '2'
 
+plugins:
+  - serverless-domain-manager
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  endpoint:
+    dev: "dev.suguru-takahashi.com"
+    prd: "suguru-takahashi.com"
+  customDomain:
+    domainName: ${self:custom.endpoint.${self:custom.stage}}
+    stage: ${self:custom.stage}
+    basePath: api
+    certificateName: '*.suguru-takahashi.com'
+    createRoute53Record: true
+    endpointType: 'regional'
+    securityPolicy: tls_1_2
+
 provider:
   name: aws
   runtime: nodejs12.x

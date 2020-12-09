@@ -19,5 +19,8 @@
   "homepage": "https://github.com/suguruTakahashi-1234/sls-hogehoge#readme",
   "dependencies": {
     "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "serverless-domain-manager": "^5.1.0"
   }
 }
