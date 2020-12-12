@@ -39,6 +39,29 @@ custom:
 
 provider:
   name: aws
+  apiKeys:
+    - free: # 使用量プラン
+        - name: ${opt:stage, self:provider.stage}-free-key # key 名
+          value: a1234567890123456789012345678aaa # 30-128文字の英数字
+    - mogemoge: # 複数のプランを設定することが可能
+        - ${opt:stage, self:provider.stage}-mogemoge-key # name, value を指定しないと value は自動生成される
+  usagePlan:
+    - free:
+        quota:
+          limit: 10 # API の呼び出しを行える最大回数
+          offset: 2 # API の呼び出し回数の初期値（通常は 0 回を指定する）
+          period: MONTH # DAY or WEEK or MONTH
+        throttle:
+          rateLimit: 2 # 1 秒あたりに処理できる API リクエスト数
+          burstLimit: 3 # 同時に処理できる最大リクエスト数
+    - mogemoge:
+        quota:
+          limit: 50000
+          offset: 1
+          period: MONTH
+        throttle:
+          burstLimit: 2000
+          rateLimit: 1000
   runtime: nodejs12.x
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
@@ -93,6 +116,7 @@ functions:
       - http:
           path: hello
           method: get
+          private: true # API キーを有効にするエンドポイントは true にする
 
   list:
     handler: todos/list.list
@@ -100,6 +124,7 @@ functions:
       - http:
           path: todos
           method: get
+          private: true
           cors: true
 
   get:
@@ -108,6 +133,7 @@ functions:
       - http:
           path: todos/{id}
           method: get
+          private: true
           cors: true
 
   create:
@@ -116,6 +142,7 @@ functions:
       - http:
           path: todos
           method: post
+          private: true
           cors: true
 
   update:
@@ -124,6 +151,7 @@ functions:
       - http:
           path: todos/{id}
           method: put
+          private: true
           cors: true
 
   delete:
@@ -132,6 +160,7 @@ functions:
       - http:
           path: todos/{id}
           method: delete
+          private: true
           cors: true
 
 resources:
