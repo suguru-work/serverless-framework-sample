@@ -1,0 +1,52 @@
+hello:
+  handler: lambda/handler.hello
+  events:
+    - http:
+        path: hello
+        method: get
+        private: true
+
+list:
+  handler: lambda/todos/list.list
+  events:
+    - http:
+        path: todos
+        method: get
+        private: true
+        cors: true
+
+get:
+  handler: lambda/todos/get.get
+  events:
+    - http:
+        path: todos/{id}
+        method: get
+        private: true
+        cors: true
+
+create:
+  handler: lambda/todos/create.create
+  events:
+    - http:
+        path: todos
+        method: post
+        private: true
+        cors: true
+
+update:
+  handler: lambda/todos/update.update
+  events:
+    - http:
+        path: todos/{id}
+        method: put
+        private: true
+        cors: true
+
+delete:
+  handler: lambda/todos/delete.delete
+  events:
+    - http:
+        path: todos/{id}
+        method: delete
+        private: true
+        cors: true

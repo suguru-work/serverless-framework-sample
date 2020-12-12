@@ -1,59 +1,25 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
 service: hogehoge
-# app and org for use with dashboard.serverless.com
-#app: your-app-name
-#org: your-org-name
-
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-frameworkVersion: '2'
-
-plugins:
-  - serverless-domain-manager
-
-custom:
-  stage: ${opt:stage, self:provider.stage}
-  endpoint:
-    dev: "dev.suguru-takahashi.com"
-    prd: "suguru-takahashi.com"
-  customDomain:
-    domainName: ${self:custom.endpoint.${self:custom.stage}}
-    stage: ${self:custom.stage}
-    basePath: api
-    certificateName: '*.suguru-takahashi.com'
-    createRoute53Record: true
-    endpointType: 'regional'
-    securityPolicy: tls_1_2
 
 provider:
   name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage,"dev"}
+  # region: ap-northeast-1 # SLL 証明書がバージニア北部にあるため、証明書を東京リージョンに作成すれば設定可能
   apiKeys:
-    - free: # 使用量プラン
-        - name: ${opt:stage, self:provider.stage}-free-key # key 名
-          value: a1234567890123456789012345678aaa # 30-128文字の英数字
-    - mogemoge: # 複数のプランを設定することが可能
-        - ${opt:stage, self:provider.stage}-mogemoge-key # name, value を指定しないと value は自動生成される
+    - free:
+        - name: ${self:provider.stage}-free-key 
+          value: a1234567890123456789012345678aaa
+    - mogemoge:
+        - ${self:provider.stage}-mogemoge-key
   usagePlan:
     - free:
         quota:
-          limit: 10 # API の呼び出しを行える最大回数
-          offset: 2 # API の呼び出し回数の初期値（通常は 0 回を指定する）
-          period: MONTH # DAY or WEEK or MONTH
+          limit: 100
+          offset: 2
+          period: MONTH
         throttle:
-          rateLimit: 2 # 1 秒あたりに処理できる API リクエスト数
-          burstLimit: 3 # 同時に処理できる最大リクエスト数
+          rateLimit: 2
+          burstLimit: 3
     - mogemoge:
         quota:
           limit: 50000
@@ -62,9 +28,8 @@ provider:
         throttle:
           burstLimit: 2000
           rateLimit: 1000
-  runtime: nodejs12.x
   environment:
-    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -76,159 +41,24 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
 
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
+plugins:
+  - serverless-domain-manager
 
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
-
-functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: hello
-          method: get
-          private: true # API キーを有効にするエンドポイントは true にする
-
-  list:
-    handler: todos/list.list
-    events:
-      - http:
-          path: todos
-          method: get
-          private: true
-          cors: true
-
-  get:
-    handler: todos/get.get
-    events:
-      - http:
-          path: todos/{id}
-          method: get
-          private: true
-          cors: true
-
-  create:
-    handler: todos/create.create
-    events:
-      - http:
-          path: todos
-          method: post
-          private: true
-          cors: true
-
-  update:
-    handler: todos/update.update
-    events:
-      - http:
-          path: todos/{id}
-          method: put
-          private: true
-          cors: true
-
-  delete:
-    handler: todos/delete.delete
-    events:
-      - http:
-          path: todos/{id}
-          method: delete
-          private: true
-          cors: true
+functions: ${file(./resources/functions.yml)}
 
 resources:
-  Resources:
-    TodosDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-#     DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
-#      - websocket: $connect
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
-#      - sns: greeter-topic
-#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
-#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
-#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
-#      - iot:
-#          sql: "SELECT * FROM 'some_topic'"
-#      - cloudwatchEvent:
-#          event:
-#            source:
-#              - "aws.ec2"
-#            detail-type:
-#              - "EC2 Instance State-change Notification"
-#            detail:
-#              state:
-#                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
-#      - cognitoUserPool:
-#          pool: MyUserPool
-#          trigger: PreSignUp
-#      - alb:
-#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
-#          priority: 1
-#          conditions:
-#            host: example.com
-#            path: /hello
+  # DynamoDB
+  - ${file(./resources/dynamo-db.yml)}
 
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+custom:
+  endpoint:
+    dev: "dev.suguru-takahashi.com"
+    prd: "suguru-takahashi.com"
+  customDomain:
+    domainName: ${self:custom.endpoint.${self:provider.stage}}
+    stage: ${self:provider.stage}
+    basePath: api
+    certificateName: '*.suguru-takahashi.com'
+    createRoute53Record: true
+    endpointType: 'regional'
+    securityPolicy: tls_1_2

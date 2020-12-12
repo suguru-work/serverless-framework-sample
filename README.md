@@ -2,7 +2,7 @@
 
 ## Architecture
 
-![](architecture.drawio.svg)
+![](./reference/architecture.drawio.svg)
 
 ## Requirement
 
