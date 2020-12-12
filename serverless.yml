@@ -9,10 +9,10 @@ provider:
     DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
   apiKeys:
     - free:
-        - name: ${self:provider.stage}-free-key 
-          value: a1234567890123456789012345678aaa
+      - name: ${self:provider.stage}-free-key
+        value: a1234567890123456789012345678aaa
     - mogemoge:
-        - ${self:provider.stage}-mogemoge-key
+      - ${self:provider.stage}-mogemoge-key
   usagePlan:
     - free:
         quota:
