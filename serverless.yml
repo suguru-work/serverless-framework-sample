@@ -5,6 +5,8 @@ provider:
   runtime: nodejs12.x
   stage: ${opt:stage,"dev"}
   # region: ap-northeast-1 # SLL 証明書がバージニア北部にあるため、証明書を東京リージョンに作成すれば設定可能
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
   apiKeys:
     - free:
         - name: ${self:provider.stage}-free-key 
@@ -28,8 +30,6 @@ provider:
         throttle:
           burstLimit: 2000
           rateLimit: 1000
-  environment:
-    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
