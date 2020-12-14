@@ -43,7 +43,7 @@ $ sls deploy
 $ sls remove
 ```
 
-## Delete Delete
+## Delete Domain
 
 ```shell
 $ sls delete_domain
