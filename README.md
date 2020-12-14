@@ -1,4 +1,4 @@
-# Serverless Framework | AWS | REST API With DynamoDB | Custom domain
+# Serverless Framework | REST API With DynamoDB | Custom domain
 
 ## Architecture
 
